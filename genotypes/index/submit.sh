@@ -1,0 +1,1 @@
+bsub -R'select[mem>40000] rusage[mem=40000]' -J index  -n 10 -M 40000 -o index.o -e index.e -q long bash ./run.sh
