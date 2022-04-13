@@ -1,0 +1,1 @@
+plink2 --make-bed --vcf /lustre/scratch123/hgi/projects/bhf_finemap/imputation/blueprint/vcf_hg38/sortedhg38_vcfblueprint_wp10_phase2_Concat.vcf.gz --out /lustre/scratch123/hgi/projects/bhf_finemap/imputation/blueprint/vcf_hg38/blueprint_bed
