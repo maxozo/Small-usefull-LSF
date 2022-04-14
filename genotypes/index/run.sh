@@ -1,1 +1,1 @@
-bcftools index --threads 10 GT_AF_ELGH_Concat.vcf.gz
+bcftools index --threads 3 $1
