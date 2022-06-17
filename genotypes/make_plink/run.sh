@@ -1,0 +1,1 @@
+bsub -R'select[mem>150000] rusage[mem=150000]' -J plink -n 5 -M 150000 -o plink.o -e plink.e -q normal  plink --make-bed --allow-extra-chr 0 --chr 1-22 XY --bcf /lustre/scratch123/hgi/projects/bhf_finemap/imputation/uk10k_1000g_blueprint/uk10k_1000g_blueprint.bcf.gz --out /lustre/scratch123/hgi/projects/bhf_finemap/imputation/uk10k_1000g_blueprint/plink_genotypes/plink_genotypes

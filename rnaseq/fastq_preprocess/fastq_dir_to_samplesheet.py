@@ -74,8 +74,8 @@ def fastq_dir_to_samplesheet(
     fastq_dir,
     samplesheet_file,
     strandedness="unstranded",
-    read1_extension=".fastq.gz",
-    read2_extension=".fastq.gz",
+    read1_extension=".1.fastq.gz",
+    read2_extension=".2.fastq.gz",
     single_end=True,
     sanitise_name=False,
     sanitise_name_delimiter="_",
@@ -100,7 +100,7 @@ def fastq_dir_to_samplesheet(
         See also https://stackoverflow.com/questions/6773584/how-is-pythons-glob-glob-ordered
         """
         return sorted(
-            glob.glob(os.path.join(fastq_dir, f"*{extension}"), recursive=False)
+            glob.glob(f"{fastq_dir}/*{extension}", recursive=False)
         )
 
     read_dict = {}
