@@ -1,0 +1,2 @@
+sample=$1
+bcftools view --threads 20 /lustre/scratch123/hgi/projects/ukbiobank_genotypes/FullRelease/Imputed/VCFs/hg38/$sample.vcf.gz -Ob -o /lustre/scratch123/hgi/projects/ukbiobank_genotypes/FullRelease/Imputed/VCFs/hg38_bcf/$sample.bcf.gz

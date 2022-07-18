@@ -1,0 +1,2 @@
+bcftools gtcheck -g /lustre/scratch123/hgi/projects/ukbiobank_genotypes/FullRelease/Imputed/VCFs/hg38_bcf_sorted/sorted_hg38_ukb_imp_chr21_v3.bcf.gz /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/ELGH_Val_frozen_repeat/work/52/2dde40c9943aa0708489fee42f0e22/CRD_CMB12813782_GT_donors.vireo.srt.vcf.gz > Ch21_Assigned_CRD_CMB12813782_gtcheck.txt
+/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/ELGH_Val_frozen_repeat/yascp/bin/gtcheck_assign.py Ch21_Assigned_CRD_CMB12813782_gtcheck.txt Ch21_CRD_CMB12813782_assignments.csv
