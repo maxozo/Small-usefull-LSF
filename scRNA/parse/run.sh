@@ -1,0 +1,2 @@
+samtools sort /lustre/scratch123/hgi/teams/hgi/mo11/tmp/parse/barcode_headAligned_anno.bam -@ 15 -O bam -o /lustre/scratch123/hgi/teams/hgi/mo11/tmp/parse/sorted_barcode_headAligned_anno.bam
+samtools index /lustre/scratch123/hgi/teams/hgi/mo11/tmp/parse/sorted_barcode_headAligned_anno.bam

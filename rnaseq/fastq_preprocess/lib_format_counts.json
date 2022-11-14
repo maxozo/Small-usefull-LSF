@@ -1,0 +1,22 @@
+{
+    "read_files": "[ /lustre/scratch123/hgi/teams/hgi/mo11/tmp/huvec/ATAC/results/fastq12/UVE_ATC13036571_1.fastq.gz, /lustre/scratch123/hgi/teams/hgi/mo11/tmp/huvec/ATAC/results/fastq12/UVE_ATC13036571_2.fastq.gz]",
+    "expected_format": "IU",
+    "compatible_fragment_ratio": 1.0,
+    "num_compatible_fragments": 19840449,
+    "num_assigned_fragments": 19840449,
+    "num_frags_with_concordant_consistent_mappings": 11797756,
+    "num_frags_with_inconsistent_or_orphan_mappings": 10221321,
+    "strand_mapping_bias": 0.4996751924688051,
+    "MSF": 0,
+    "OSF": 0,
+    "ISF": 5895046,
+    "MSR": 0,
+    "OSR": 0,
+    "ISR": 5902710,
+    "SF": 5035015,
+    "SR": 5186306,
+    "MU": 0,
+    "OU": 0,
+    "IU": 0,
+    "U": 0
+}

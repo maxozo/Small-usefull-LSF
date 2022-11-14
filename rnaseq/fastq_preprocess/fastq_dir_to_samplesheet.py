@@ -100,7 +100,7 @@ def fastq_dir_to_samplesheet(
         See also https://stackoverflow.com/questions/6773584/how-is-pythons-glob-glob-ordered
         """
         return sorted(
-            glob.glob(f"{fastq_dir}/*{extension}", recursive=False)
+            glob.glob(f"{fastq_dir}/*/*{extension}", recursive=False)
         )
 
     read_dict = {}

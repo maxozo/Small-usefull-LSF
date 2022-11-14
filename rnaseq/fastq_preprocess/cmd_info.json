@@ -1,0 +1,17 @@
+{
+    "salmon_version": "1.4.0",
+    "index": "/lustre/scratch123/hgi/teams/hgi/mo11/devel/salmon_index_Homo_sapiens.GRCh38.cdna.all",
+    "libType": "A",
+    "threads": "1",
+    "seqBias": [],
+    "skipQuant": [],
+    "gcBias": [],
+    "posBias": [],
+    "quiet": [],
+    "output": ".",
+    "mates1": "/lustre/scratch123/hgi/teams/hgi/mo11/tmp/huvec/ATAC/results/fastq12/UVE_ATC13036571_1.fastq.gz",
+    "mates2": "/lustre/scratch123/hgi/teams/hgi/mo11/tmp/huvec/ATAC/results/fastq12/UVE_ATC13036571_2.fastq.gz",
+    "useVBOpt": [],
+    "numBootstraps": "100",
+    "auxDir": "aux_info"
+}

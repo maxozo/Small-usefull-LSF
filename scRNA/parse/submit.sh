@@ -1,0 +1,1 @@
+bsub -R'select[mem>40000] rusage[mem=40000]' -J sort_and_index  -n 15 -M 40000 -o sort_and_index.o -e sort_and_index.e -q long bash ./run.sh
