@@ -20,7 +20,11 @@ def get_field_info(rec):
     info_fields = list(rec.info)
     info_string=''
     for i_field in info_fields:
-        info_string+=f"{i_field}={rec.info[i_field][0]};"    
+        try:
+            idrt1 = rec.info[i_field][0]
+        except:
+            idrt1 = rec.info[i_field]
+        info_string+=f"{i_field}={idrt1};"    
     return {'#CHROM':rec.chrom,
                           'POS':rec.pos,
                           'ID':rec.id,
