@@ -1,0 +1,43 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@node-11-2-3>
+Subject: Job 4581019: <concat> in cluster <farm5> Exited
+
+Job <concat> was submitted from host <hgi-farm5> by user <mercury> in cluster <farm5> at Tue Nov 15 18:36:04 2022
+Job was executed on host(s) <node-11-2-3>, in queue <basement>, as user <mercury> in cluster <farm5> at Tue Nov 15 18:36:09 2022
+</nfs/users/nfs_m/mercury> was used as the home directory.
+</lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/random/scRNA/number_of_sites_in_vcfs_for_celsnp> was used as the working directory.
+Started at Tue Nov 15 18:36:09 2022
+Terminated at Tue Nov 15 18:37:53 2022
+Results reported at Tue Nov 15 18:37:53 2022
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python overlapping_sites.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   85.59 sec.
+    Max Memory :                                 6290 MB
+    Average Memory :                             3682.06 MB
+    Total Requested Memory :                     40000.00 MB
+    Delta Memory :                               33710.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                13
+    Run time :                                   104 sec.
+    Turnaround time :                            109 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <concat.e> for stderr output of this job.
+
