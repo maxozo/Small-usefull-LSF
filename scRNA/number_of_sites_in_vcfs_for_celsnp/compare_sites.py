@@ -1,0 +1,15 @@
+import pandas as pd
+
+Cellsnp_Sites = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/cellsnp_sites.tsv')
+UKBB_Sites = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/ukbb_all_sites.tsv')
+Currently_Utilised = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/data_ukbb_elgh_cellsnp.tsv')
+ELGH_Sites = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/data_ukbb_elgh_cellsnp.tsv')
+ukb_set = set(UKBB_Sites['0'])
+elgh_set = set(ELGH_Sites['0'])
+current_set_in_genotypes = set(Currently_Utilised['0'])
+cellsnp = set(Cellsnp_Sites['0'])
+overlap_ukbb = ukb_set.intersection(elgh_set)
+uniqu_elgh = elgh_set.difference(cellsnp)
+uniqu_ukbb = ukb_set.difference(cellsnp)
+len(uniqu_ukbb)
+print('Done')

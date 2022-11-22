@@ -1,0 +1,12 @@
+*.o
+*.e
+*.tsv
+*.txt
+*.vcf
+*.vcf.gz
+*.bed
+*.bcf
+*.bcf.gz
+*.bin
+*.csv
+*.tmp
