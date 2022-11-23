@@ -1,1 +1,1 @@
-bsub -R'select[mem>40000] rusage[mem=40000]' -J concat  -n 1 -M 40000 -o concat.o -e concat.e -q basement python overlapping_sites.py
+bsub -R'select[mem>499392] rusage[mem=499392]' -J concat  -n 1 -M 499392 -o concat.o -e concat.e -q basement python overlapping_sites.py

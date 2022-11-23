@@ -33,8 +33,8 @@ for path in all_vcfs:
     
  
     print('path')
-All_Tranche_Data.to_csv('/lustre/scratch123/hgi/projects/cardinal_analysis/analysis/mo11/combined_reports/Combined_UKBB_Tranche_Report.tsv',sep='\t',index=False)    
-UKBB_Reports.to_csv('/lustre/scratch123/hgi/projects/cardinal_analysis/analysis/mo11/combined_reports/Combined_UKBB_Donor_Report.tsv',sep='\t',index=False)
-UKBB_Not_Expected.to_csv('/lustre/scratch123/hgi/projects/cardinal_analysis/analysis/mo11/combined_reports/Combined_UKBB_Not_Expected.tsv',sep='\t',index=False)
-UKBB_Missing.to_csv('/lustre/scratch123/hgi/projects/cardinal_analysis/analysis/mo11/combined_reports/Combined_UKBB_Missing.tsv',sep='\t',index=False)
+All_Tranche_Data.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/updated_reports/Combined_UKBB_Tranche_Report.tsv',sep='\t',index=False)    
+UKBB_Reports.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/updated_reports/Combined_UKBB_Donor_Report.tsv',sep='\t',index=False)
+UKBB_Not_Expected.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/updated_reports/Combined_UKBB_Not_Expected.tsv',sep='\t',index=False)
+UKBB_Missing.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/updated_reports/Combined_UKBB_Missing.tsv',sep='\t',index=False)
     
