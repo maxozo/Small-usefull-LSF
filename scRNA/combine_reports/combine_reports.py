@@ -5,11 +5,12 @@ import glob
 print('lets combine reports')
 
 
-all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/*/Summary_plots')
+
 All_Tranche_Data = pd.DataFrame()
 UKBB_Reports = pd.DataFrame()
 UKBB_Missing = pd.DataFrame()
 UKBB_Not_Expected = pd.DataFrame()
+all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/*/Summary_plots')
 for path in all_vcfs:
     print(path)
     Tranche_name = path.split('/')[-2]
