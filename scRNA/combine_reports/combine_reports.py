@@ -31,8 +31,6 @@ for path in all_vcfs:
     except:
         print(f'{Tranche_name} doesnt contain UKBB reports')
     All_Tranche_Data = pd.concat([All_Tranche_Data,Tranche_Data])
-    
- 
     print('path')
 All_Tranche_Data.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/updated_reports/Combined_UKBB_Tranche_Report.tsv',sep='\t',index=False)    
 UKBB_Reports.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/updated_reports/Combined_UKBB_Donor_Report.tsv',sep='\t',index=False)

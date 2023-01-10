@@ -10,7 +10,7 @@ def update_all_metadata():
         os.system(f"cd {path1} && cp Extra_Metadata_Donors.tsv Extra_Metadata_Donors_old1.tsv && cp Extra_Metadata.tsv Extra_Metadata_old1.tsv && bash Update_Extra_Metadata.sh")
             
 def add_extraction_date_to_reports():
-    # This was used to extract all the timings from Stephens metadata to add to the UKBB reports.
+    # This was used to extract all the timings from Stephens metadata to add to the YASCP input files.
     All_Concentrated_Lab_Metadata = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged.tsv',sep='\t')
     All_Concentrated_Lab_Metadata = All_Concentrated_Lab_Metadata.set_index('Cellaca ID')
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/*/results/yascp_inputs/Extra_Metadata_Donors.tsv')
@@ -68,7 +68,7 @@ def add_extraction_date_to_reports():
 
         
 def combine_all_meta():
-    # This is used to combine all Stephens metadata reports in one file.
+    # This is used to combine all Stephens metadata reports in one file that is later on utilised to determine the PBMC extraction date and the time of sequencing.
     all_vcfs = glob.glob(f'/nfs/team151/CARDINAL/*/*eta_*.xl*')
     All_META = pd.DataFrame()
     for xl1 in all_vcfs:
