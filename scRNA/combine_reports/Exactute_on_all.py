@@ -66,6 +66,66 @@ def add_extraction_date_to_reports():
     All_Failed = pd.DataFrame(all_unnown)
     All_Failed.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/Failed_To_Determine_time.tsv',sep='\t')
 
+def get_total_cell_compositions():
+    import pandas as pd
+    import glob
+    import os
+    # os.getcwd()
+    
+    # #1 Step - extract all the var objects in each of the h5ad files and save them
+    # all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/*/results_rsync2/results/adata.h5ad')
+
+    # for path in all_vcfs:
+    #     print(path)
+    #     adata = sc.read_h5ad(filename=path)
+    #     Out_file = '/'.join(path.split('/')[:-1])
+    #     adata.var.to_csv(f"{Out_file}/adata_var.tsv",sep='\t')
+    #     del adata    
+    
+    
+    # #2 Step - Merge all the var objects together in one file
+    # all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/*/results_rsync2/results/adata_obs.tsv')
+
+    # Data_All = pd.DataFrame()
+    # count=0
+    # for path in all_vcfs:
+    #     count+=1
+    #     print(count)
+    #     print(path)
+    #     p2 = '/'.join(path.split('/')[:-1])
+    #     Data_QC = pd.read_csv(path,sep='\t',index_col=0)
+    #     Celltype = pd.read_csv(f"{p2}/celltype/All_Celltype_Assignments.csv",sep='\t',index_col=0)
+    #     Data_QC['Azimuth l2'] = Celltype['Azimuth:predicted.celltype.l2']
+    #     Data_QC[Data_QC['cell_passes_qc'] ==True]['Azimuth l2'].value_counts()
+    #     Data_All= pd.concat([Data_All,Data_QC])
+
+    # Data_All.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Merged_Obs.tsv',sep='\t')
+    
+    # #3 Step - Count all the failed and passed cells
+    # Data_All = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Merged_Obs.tsv',sep='\t',index_col=0)
+    # val_counts_all = Data_All['Azimuth l2'].value_counts()
+    # val_counts_passqc = Data_All[Data_All['cell_passes_qc'] ==True]['Azimuth l2'].value_counts()
+    # val_counts_failqc = Data_All[Data_All['cell_passes_qc'] ==False]['Azimuth l2'].value_counts()
+
+    # val_counts_failqc.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/val_counts_failqc.tsv',sep='\t')
+    # val_counts_passqc.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/val_counts_passqc.tsv',sep='\t')
+    # val_counts_all.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/val_counts_all.tsv',sep='\t')
+
+    # #4 Step - generate an output file that lists the combined fails and passes
+    Data1 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/val_counts_failqc.tsv',sep='\t',index_col=0)
+    Data2 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/val_counts_passqc.tsv',sep='\t',index_col=0)
+    Data3 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/val_counts_all.tsv',sep='\t',index_col=0)
+
+    Data1=Data1.rename(columns={'Azimuth l2':'fails qc'})
+    Data2=Data2.rename(columns={'Azimuth l2':'passes qc'})
+    Data3=Data3.rename(columns={'Azimuth l2':'all cell nr'})
+
+
+    Combined = pd.concat([Data3,Data2,Data1],axis=1)
+    Combined['percent passing qc']= Combined['passes qc']/Combined['all cell nr']*100
+    Combined.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/total_cell_counts_per_celltype.tsv',sep='\t')
+    Combined['passes qc']+Combined['fails qc']
+    print(done)
         
 def combine_all_meta():
     # This is used to combine all Stephens metadata reports in one file that is later on utilised to determine the PBMC extraction date and the time of sequencing.
