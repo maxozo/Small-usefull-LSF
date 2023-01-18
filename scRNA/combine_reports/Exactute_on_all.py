@@ -11,7 +11,7 @@ def update_all_metadata():
             
 def add_extraction_date_to_reports():
     # This was used to extract all the timings from Stephens metadata to add to the YASCP input files.
-    All_Concentrated_Lab_Metadata = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged.tsv',sep='\t')
+    All_Concentrated_Lab_Metadata = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged2.tsv',sep='\t')
     All_Concentrated_Lab_Metadata = All_Concentrated_Lab_Metadata.set_index('Cellaca ID')
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/*/results/yascp_inputs/Extra_Metadata_Donors.tsv')
     all_unnown = []
@@ -20,7 +20,12 @@ def add_extraction_date_to_reports():
         Tranche_Data_path=pd.read_csv(f'{Tranche_Data_path}/Extra_Metadata.tsv',sep='\t')
         Pool = path.split('/')[-4]
         D1 = pd.read_csv(path,sep='\t')
-        D1.donor=D1.donor.str.replace('^0*', '')
+        if (Pool=='Blood_Fresh'):
+            continue
+        try:
+            D1.donor=D1.donor.str.replace('^0*', '')
+        except:
+            continue
         All_Concentrated_Lab_Metadata['SAMPLE BARCODE']=All_Concentrated_Lab_Metadata['SAMPLE BARCODE'].str.replace('^0*', '')
         D1['State']=''
         D1['PBMC extraction date']=''
@@ -140,7 +145,7 @@ def combine_all_meta():
             All_META=pd.concat([All_META,D2])
         else:
             print(f"fail:{xl1}")  
-    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged.tsv',sep='\t')
+    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged2.tsv',sep='\t')
 add_extraction_date_to_reports()
-
+# combine_all_meta()
 print('Done')
