@@ -42,7 +42,7 @@ for path in all_vcfs:
         print(i)
     All_Deconvoluted_merged = pd.concat([All_Deconvoluted_merged,Deconvoluted_Reports])
 All_Samples_Expected = pd.DataFrame(all_samples).T
-GEM_BATCHED = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/files/Information_For10x111122.csv')
+GEM_BATCHED = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/files/meta_data.tsv',sep='\t')
 GEM_BATCHED = GEM_BATCHED.set_index('Library Plate')
 GEM_BATCHED = GEM_BATCHED.reset_index()
 All_Deconvoluted_merged['Chromium_channel'] = All_Deconvoluted_merged['Chromium channel number'].str.replace(':','_').str[:-1]

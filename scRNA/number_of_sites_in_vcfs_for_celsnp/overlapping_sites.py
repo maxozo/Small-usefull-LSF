@@ -65,20 +65,20 @@ def get_field_info(rec):
 # pd.DataFrame(elgh_sites).to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/full_elgh_sites_all.tsv')
 
 # UKBB_sites = /lustre/scratch123/hgi/projects/ukbiobank_genotypes/FullRelease/Imputed/VCFs/hg38_bcf_sorted
-all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbiobank_genotypes/FullRelease/Imputed/VCFs/hg38_bcf_sorted/*.bcf.gz')
+# all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbiobank_genotypes/FullRelease/Imputed/VCFs/hg38_bcf_sorted/*.bcf.gz')
 
-for vcf_file in all_vcfs:
-    print(vcf_file)
-    nam = vcf_file.split('/')[-1].split('.')[1]
-    print(nam)
-    ukbb_sites = []
-    count=0
-    bcf_in = VariantFile(vcf_file) 
-    for rec in bcf_in.fetch():
-        sites = get_field_info(rec)    
-        ukbb_sites.append(sites)
-    pd.DataFrame(ukbb_sites).to_csv(f'/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/full_{nam}_ukbb_all_sites.tsv')
-print('done with full_ukbb_all_sites')
+# for vcf_file in all_vcfs:
+#     print(vcf_file)
+#     nam = vcf_file.split('/')[-1].split('.')[1]
+#     print(nam)
+#     ukbb_sites = []
+#     count=0
+#     bcf_in = VariantFile(vcf_file) 
+#     for rec in bcf_in.fetch():
+#         sites = get_field_info(rec)    
+#         ukbb_sites.append(sites)
+#     pd.DataFrame(ukbb_sites).to_csv(f'/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/full_{nam}_ukbb_all_sites.tsv')
+# print('done with full_ukbb_all_sites')
 
 # UKBB_sites = /lustre/scratch123/hgi/projects/ukbiobank_genotypes/FullRelease/Imputed/VCFs/hg38_bcf_sorted
 all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/genotypes/filtered_genotypes/vcf/*.vcf.gz')
@@ -90,5 +90,5 @@ for vcf_file in all_vcfs:
     for rec in bcf_in.fetch():
         sites = get_field_info(rec)    
         elgh_not_merged_sites.append(sites)
-pd.DataFrame(elgh_not_merged_sites).to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/full_elgh_not_merged_sites.tsv')
+pd.DataFrame(elgh_not_merged_sites).to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/analysis/mo11/cellsnp_sites_file_expanded/full_elgh_not_merged_sites2.tsv')
 print('done with full_elgh_not_merged_sites')
