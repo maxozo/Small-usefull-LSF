@@ -15,7 +15,9 @@ def add_extraction_date_to_reports():
     All_Concentrated_Lab_Metadata = All_Concentrated_Lab_Metadata.set_index('Cellaca ID')
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/*/results/yascp_inputs/Extra_Metadata_Donors.tsv')
     all_unnown = []
+    # gem_batch_data = pd.read_csv("/lustre/scratch123/hgi/projects/cardinal_analysis/analysis/common_files/metadata/GEM_metadata_merged.tsv",sep='\t')
     for path in all_vcfs:  
+        # path=f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/Cardinal_46019_Oct_20_2022/results/yascp_inputs/Extra_Metadata_Donors.tsv'
         Tranche_Data_path = '/'.join(path.split('/')[:-1])
         Tranche_Data_path=pd.read_csv(f'{Tranche_Data_path}/Extra_Metadata.tsv',sep='\t')
         Pool = path.split('/')[-4]
@@ -30,6 +32,8 @@ def add_extraction_date_to_reports():
         D1['State']=''
         D1['PBMC extraction date']=''
         for i1,don1_row in D1.iterrows():
+            if (don1_row['donor'] =='30007454087'):
+                print('yes')
             Tr1 = Tranche_Data_path[Tranche_Data_path['chromium_channel']==don1_row['chromium_channel']]
             Experiment = Tr1['experiment_id'].values[0]
             # print(don1_row)
@@ -39,12 +43,16 @@ def add_extraction_date_to_reports():
             except:
                 donor_lims_id = Tr1['public_name'].values[0]
             chrom_chan = don1_row['chromium_channel']
+            chrom_chan_id = chrom_chan.split(':')[0]
+            # Gem_Batch = gem_batch_data[gem_batch_data['Chromium channel number']==chrom_chan]
+            # Don_GEM = Gem_Batch['Vacutainer ID']==don1_row['donor']
+            # LCA Connect PCRXP
             donor = don1_row['donor']
             if ('THP1' not in donor and 'U937' not in donor):
                 try:
-                    Donor_vars = All_Concentrated_Lab_Metadata[All_Concentrated_Lab_Metadata['Cellaca ID']==donor_lims_id]
-                    D1.loc[i1,'PBMC extraction date']=Donor_vars['PBMC extraction date '].values[0]
-                    D1.loc[i1,'State']=Donor_vars['State'].values[0]
+                    Donor_vars = All_Concentrated_Lab_Metadata.loc[donor_lims_id]
+                    D1.loc[i1,'PBMC extraction date']=Donor_vars['PBMC extraction date ']
+                    D1.loc[i1,'State']=Donor_vars['State']
                 except:
                     Donor_vars_Pre = All_Concentrated_Lab_Metadata[All_Concentrated_Lab_Metadata['SAMPLE BARCODE']==donor]
                     Donor_vars = Donor_vars_Pre
@@ -145,7 +153,7 @@ def combine_all_meta():
             All_META=pd.concat([All_META,D2])
         else:
             print(f"fail:{xl1}")  
-    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged2.tsv',sep='\t')
-add_extraction_date_to_reports()
-# combine_all_meta()
+    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_08_02_2023.tsv',sep='\t')
+# add_extraction_date_to_reports()
+combine_all_meta()
 print('Done')
