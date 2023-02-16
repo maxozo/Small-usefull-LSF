@@ -11,7 +11,7 @@ def update_all_metadata():
             
 def add_extraction_date_to_reports():
     # This was used to extract all the timings from Stephens metadata to add to the YASCP input files.
-    All_Concentrated_Lab_Metadata = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged2.tsv',sep='\t')
+    All_Concentrated_Lab_Metadata = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_16_03_2023.tsv',sep='\t')
     All_Concentrated_Lab_Metadata = All_Concentrated_Lab_Metadata.set_index('Cellaca ID')
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/*/results/yascp_inputs/Extra_Metadata_Donors.tsv')
     all_unnown = []
@@ -57,14 +57,18 @@ def add_extraction_date_to_reports():
                     Donor_vars_Pre = All_Concentrated_Lab_Metadata[All_Concentrated_Lab_Metadata['SAMPLE BARCODE']==donor]
                     Donor_vars = Donor_vars_Pre
                     if(len(Donor_vars)>1):
-                        Donor_vars = Donor_vars[Donor_vars['LCA_PBMC']==donor_lims_id.split(':')[0]]
-                        if(len(Donor_vars)<1):
-                            Donor_vars = Donor_vars_Pre[Donor_vars_Pre.index==donor_lims_id]
+                        try:
+                            Donor_vars = Donor_vars[Donor_vars['LCA_PBMC']==donor_lims_id.split(':')[0]]
                             if(len(Donor_vars)<1):
-                                # Here there is an ambiguity in which is the corect donor as the ids dont match
-                                record=False
-                                all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC']),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools']),'reasoning':'Ids between LIMS and Metadata do not match'})
-                                print(f'breaking: {donor}')
+                                Donor_vars = Donor_vars_Pre[Donor_vars_Pre.index==donor_lims_id]
+                                if(len(Donor_vars)<1):
+                                    # Here there is an ambiguity in which is the corect donor as the ids dont match
+                                    record=False
+                                    all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC']),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools']),'reasoning':'Ids between LIMS and Metadata do not match'})
+                                    print(f'breaking: {donor}')
+                        except:
+                            all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index.astype(str)), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC']),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools']),'reasoning':'Ids between LIMS and Metadata do not match'})
+                            print(f'breaking: {donor}')
                     elif len(Donor_vars)<1:
                         # Here we dont find the DOnor at all in metadata
                         record=False
@@ -153,7 +157,7 @@ def combine_all_meta():
             All_META=pd.concat([All_META,D2])
         else:
             print(f"fail:{xl1}")  
-    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_08_02_2023.tsv',sep='\t')
-# add_extraction_date_to_reports()
-combine_all_meta()
+    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_16_03_2023.tsv',sep='\t')
+add_extraction_date_to_reports()
+# combine_all_meta()
 print('Done')

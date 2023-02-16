@@ -5,12 +5,32 @@ import glob
 print('lets combine reports')
 
 def Generate_Combined_Reports():
-    outdir = "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_01_ELGH"
+    outdir = "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_15_02"
     All_Tranche_Data = pd.DataFrame()
     UKBB_Reports = pd.DataFrame()
     UKBB_Missing = pd.DataFrame()
     UKBB_Not_Expected = pd.DataFrame()
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/*/Summary_plots')
+    
+    all_gems = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/genestack/gs2/GEMS/*')
+    GEMS=pd.DataFrame()
+    for g1 in all_gems:
+        d1 = pd.read_csv(g1)
+        GEMS = pd.concat([GEMS,d1])
+
+    GEMS=GEMS.set_index('Name')
+    GEMS_DONORS = GEMS['Sample Source ID'].str.split(',')
+    GEMS_DONOR_24h = GEMS['24h'].str.split(',')
+    GEMS_DONOR_48h = GEMS['48h'].str.split(',')
+    GEMS_DONOR_72h = GEMS['72h'].str.split(',')
+    GEMS_DONOR_frozen_h = GEMS['Frozen'].str.split(',')
+    
+    all_donors_gs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/genestack/gs2/meta/*')
+    DONS=pd.DataFrame()
+    for g1 in all_donors_gs:
+        d1 = pd.read_csv(g1)
+        DONS = pd.concat([DONS,d1])    
+    DONS['Name'] = DONS['Name'].astype(str).str.replace('^0*', '')
     for path in all_vcfs:
         print(path)
         # path='/lustre/scratch123/hgi/projects/cardinal_analysis/qc/Cardinal_46019_Oct_20_2022/Summary_plots'
@@ -175,10 +195,17 @@ def Generate_Combined_Reports():
     # UKBB_Reports[UKBB_Reports['Sequencing time'].isnull()]
 
     # Fix lab live cell counts
+    UKBB_Reports['Antibody batch']='N/A'
+    UKBB_Reports['PBMC extraction date']='N/A'
+    UKBB_Reports['Conc Pass']='N/A'
+    UKBB_Reports['RapidSphere Beads']='N/A'   
+    UKBB_Reports['GEM Batch']='N/A'
+    
     UKBB_Reports_UKB_0 = UKBB_Reports[~UKBB_Reports['site'].isnull()]
     UKBB_Reports_UKB_1 = UKBB_Reports[UKBB_Reports['site'].isnull()]
     UKBB_Reports_UKB_1 = UKBB_Reports
     UKBB_Reports_UKB_1_FIXED =pd.DataFrame()
+    failed_donors=[]
     for pool in set(UKBB_Reports_UKB_1['Pool ID']):
         all_donor_data = UKBB_Reports_UKB_1[UKBB_Reports_UKB_1['Pool ID']==pool]
         experiment = list(set(UKBB_Reports_UKB_1[UKBB_Reports_UKB_1['Pool ID']==pool]['Experiment ID']))[0]
@@ -189,7 +216,7 @@ def Generate_Combined_Reports():
         
         Extra_Metadata = pd.read_csv(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/{experiment}/results/yascp_inputs/Extra_Metadata_Donors.tsv',sep='\t')
         Extra_Metadata['donor'] = Extra_Metadata['donor'].astype(str).str.replace('^0*', '')
-        #         Date sample received                                                                   NaN
+        # Date sample received                                                                   NaN
         # viability                                                                              NaN
         # lab_live_cell_count                                                                    NaN
         # site                                                                                   NaN
@@ -202,7 +229,54 @@ def Generate_Combined_Reports():
                 print('yes')
             Donor_id = f"{row['Donor id']}_{row['Donor id']}"
             Vacutainer = row['Vacutainer ID']
-            
+            if(Vacutainer=='30007491914'):
+                print('this one')
+            CC = row['Chromium channel number']
+            try:
+                LIBRARY_GEMS = GEMS.loc[CC]
+                GEM_BATCH = GEMS.loc[CC,'GEMS batch']
+                State = GEMS_DONORS.loc[CC]
+                index = [idx for idx, s in enumerate(State) if Vacutainer in s][0]
+                timing='24h'
+                if GEMS_DONOR_24h[CC][index]!='Yes':
+                    timing='48h'
+                    if GEMS_DONOR_48h[CC][index]!='Yes':
+                        timing='72h'
+                        if GEMS_DONOR_72h[CC][index]!='Yes':
+                            timing='frozen'
+                            if GEMS_DONOR_frozen_h[CC][index]!='Yes':
+                                timing='N/A'
+                donor_data = DONS[DONS['Name'] ==Vacutainer]
+                # donor_data = donor_data[donor_data['State']==timing]
+                try:
+                    State_split = donor_data['State'].values[0].split(',')
+                except:
+                    State_split = ['dummy']
+            except:
+                State_split = ['dummy']
+                timing='N/A'
+                donor_data = DONS[DONS['Name'] ==Vacutainer]
+                
+            if (len(State_split)>1):
+                try:
+                    index = [idx for idx, s in enumerate(State_split) if timing in s][0]
+                except:
+                    failed_donors.append(Vacutainer)
+                    continue
+                Antibody_batch=donor_data['Antibody batch'].astype(str).values[0].split(',')[index]
+                Viability=donor_data['Viability'].astype(str).values[0].split(',')[index]
+                Live_cells=donor_data['Live cells'].astype(str).values[0].split(',')[index]
+                PBMC_extraction_date=donor_data['PBMC extraction date'].astype(str).values[0].split(',')[index]
+                Conc_Pass=donor_data['Conc Pass'].astype(str).values[0].split(',')[index]
+                RapidSphere_Beads=donor_data['RapidSphere Beads'].astype(str).values[0].split(',')[index]
+                                                
+            else:
+                Antibody_batch=' or '.join(set(donor_data['Antibody batch'].astype(str)))
+                Viability = ' or '.join(set(donor_data['Viability'].astype(str)))
+                Live_cells = ' or '.join(set(donor_data['Live cells'].astype(str)))
+                PBMC_extraction_date = ' or '.join(set(donor_data['PBMC extraction date'].astype(str)))
+                Conc_Pass = ' or '.join(set(donor_data['Conc Pass'].astype(str)))
+                RapidSphere_Beads = ' or '.join(set(donor_data['RapidSphere Beads'].astype(str)))
             if (Donor_id=='celline_celline'):
                 continue
             else:
@@ -224,24 +298,51 @@ def Generate_Combined_Reports():
                             #     Meta = Meta[Meta['live_cell_count'] ==all_donor_data.loc[i,'lab_live_cell_count']]
                         # time = all_donor_data['Sequencing time'].values[0]
                         # Meta = Meta[Meta['State']==time]
-                    all_donor_data.loc[i,'Date sample received']=' or '.join(set(Meta['RECIEVED']))
-                    all_donor_data.loc[i,'viability']=' or '.join(set(Meta['viability']))
-                    all_donor_data.loc[i,'lab_live_cell_count']=' or '.join(set(Meta['live_cell_count']))
-                    all_donor_data.loc[i,'site']=' or '.join(set(Meta['SITE']))
-                    all_donor_data.loc[i,'amount recieved']=' or '.join(set(Meta['customer_measured_volume'].astype(str)))
-                    all_donor_data.loc[i,'Sequencing time']=' or '.join(set(Meta['State'].astype(str)))
+                    viability = ' or '.join(set(Meta['viability']))
+                    Recieved = ' or '.join(set(Meta['RECIEVED']))
+                    cell_count = ' or '.join(set(Meta['live_cell_count']))
+                    site = ' or '.join(set(Meta['SITE']))
+                    amount_recieved = ' or '.join(set(Meta['customer_measured_volume'].astype(str)))
+                    sequencing_time = ' or '.join(set(Meta['State'].astype(str)))
+                    if (timing=='N/A'):
+                        timing = sequencing_time
+                    if (Viability==''):
+                        Viability=viability
+                    if (Live_cells==''):
+                        Live_cells=cell_count
+                    print(f"{Live_cells} vs {cell_count}")
+                    print(f"{Viability} vs {viability}")
+                    print(f"{timing} vs {sequencing_time}")
+                    f"{timing} vs {sequencing_time}"
+                    f"{Viability} vs {viability}"
+                    f"{Live_cells} vs {cell_count}"
+
+                    all_donor_data.loc[i,'Antibody batch']=Antibody_batch
+                    all_donor_data.loc[i,'PBMC extraction date']=PBMC_extraction_date
+                    all_donor_data.loc[i,'Conc Pass']=Conc_Pass
+                    all_donor_data.loc[i,'RapidSphere Beads']=RapidSphere_Beads
+                    all_donor_data.loc[i,'GEM Batch']=GEM_BATCH
+                                             
+                    all_donor_data.loc[i,'Date sample received']=Recieved
+                    all_donor_data.loc[i,'viability']=Viability
+                    all_donor_data.loc[i,'lab_live_cell_count']=Live_cells
+                    all_donor_data.loc[i,'site']=site
+                    all_donor_data.loc[i,'amount recieved']=amount_recieved
+                    all_donor_data.loc[i,'Sequencing time']=timing
                 except:
                     print(f'pool {experiment} doesnt contain the metadata')
                 
         UKBB_Reports_UKB_1_FIXED=pd.concat([UKBB_Reports_UKB_1_FIXED,all_donor_data])
     UKBB_Reports = UKBB_Reports_UKB_1_FIXED
     UKBB_Reports = UKBB_Reports.drop_duplicates()
-        
+    print(failed_donors)
+    UKBB_Reports.loc[UKBB_Reports['GEM Batch']==20240215,'GEM Batch']=200016416452720240215
+    UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='22 Spetember','GEM Batch']='N/A'
+    UKBB_Reports['GEM Batch'] = 'GEM:'+UKBB_Reports['GEM Batch'].astype(str)
+    UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='GEM:nan','GEM Batch']='GEM:N/A'
+    UKBB_Reports['Antibody batch'] = 'AB:'+UKBB_Reports['Antibody batch'].astype(str)
+    UKBB_Reports['RapidSphere Beads'] = 'RB:'+UKBB_Reports['RapidSphere Beads'].astype(str)
 
-    
-
-
-    
     # Here we postprocess the data by moving pihats <0.7 to missing and removing tranches with no UKBB samples 
     All_Tranche_Data.to_csv(f'{outdir}/total2/Combined_UKBB_Tranche_Report.tsv',sep='\t',index=False)    
     UKBB_Reports.to_csv(f'{outdir}/total2/Combined_UKBB_Donor_Report.tsv',sep='\t',index=False)
@@ -263,7 +364,7 @@ def Generate_Combined_Reports():
     To_Add_to_Missing = Fail_Pihat_threshold[['Pool ID', 'Vacutainer ID']]
     UKBB_Missing_UKBB = pd.concat([UKBB_Missing,To_Add_to_Missing])
     UKBB_Reports_UKB = UKBB_Reports_UKB.rename(columns={'Sequencing time':'Library prep time'})
-    UKBB_Reports_UKB = UKBB_Reports_UKB.drop(columns=['PiHat: Expected', 'Infered Relatednes (PiHAT>0.3)','PBMC extraction date'])
+    UKBB_Reports_UKB = UKBB_Reports_UKB.drop(columns=['PiHat: Expected', 'Infered Relatednes (PiHAT>0.3)','PBMC extraction date','Antibody batch','Conc Pass','RapidSphere Beads'])
     # To_Add_to_Missing.rename(columns={'Pool ID':'Pool','Vacutainer ID':'Sample'})
     Dublicated = UKBB_Reports_UKB[['Vacutainer ID','Overall Pass Fail']][UKBB_Reports_UKB['Vacutainer ID'].duplicated()]
     
@@ -287,8 +388,8 @@ def Generate_Combined_Reports():
     UKBB_Reports_UKB.to_csv(f'{outdir}/ukbb_pihat_processed/Combined_UKBB_Donor_Report.tsv',sep='\t',index=False)
     All_Tranche_Data_UKBB.to_csv(f'{outdir}/ukbb_pihat_processed/Combined_UKBB_Tranche_Report.tsv',sep='\t',index=False)    
  
-    f1 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2022_11/ukbb_pihat_processed'
-    f2 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_01/ukbb_pihat_processed'
+    f1 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_01_3/ukbb_pihat_processed'
+    f2 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_15_02/ukbb_pihat_processed'
     Donor_Report_1 = pd.read_csv(f"{f1}/Combined_UKBB_Donor_Report.tsv",sep='\t')
     Donor_Report_2 = pd.read_csv(f"{f2}/Combined_UKBB_Donor_Report.tsv",sep='\t') 
     
@@ -559,7 +660,7 @@ def Generate_Combined_Reports_ELGH():
     To_Add_to_Missing = Fail_Pihat_threshold[['Pool ID', 'Vacutainer ID']]
     UKBB_Missing_UKBB = pd.concat([UKBB_Missing,To_Add_to_Missing])
     ELGH_Reports_UKB = ELGH_Reports_UKB.rename(columns={'Sequencing time':'Library prep time'})
-    ELGH_Reports_UKB = ELGH_Reports_UKB.drop(columns=['PiHat: Expected', 'Infered Relatednes (PiHAT>0.3)','PBMC extraction date'])
+    ELGH_Reports_UKB = ELGH_Reports_UKB.drop(columns=['PiHat: Expected', 'Infered Relatednes (PiHAT>0.3)','PBMC extraction date','Antibody batch','Conc Pass','RapidSphere Beads'])
     # To_Add_to_Missing.rename(columns={'Pool ID':'Pool','Vacutainer ID':'Sample'})
     Dublicated = ELGH_Reports_UKB[['Vacutainer ID','Overall Pass Fail']][ELGH_Reports_UKB['Vacutainer ID'].duplicated()]
     
@@ -601,4 +702,4 @@ def compare_produced_reports():
     Donor_Report_2 = pd.read_csv(f"{f2}/Combined_UKBB_Donor_Report.tsv",sep='\t')
 
     print('Done')
-Generate_Combined_Reports_ELGH()
+Generate_Combined_Reports()

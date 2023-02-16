@@ -43,5 +43,17 @@ def Bridge_Files():
     
 Shipping_Manifests()
 Bridge_Files()  
+
+
+# def ronie_try:
+#     import pandas as pd
+#     data = [{'Gene_st':3,'Gene_end':20}]
+#     data.append({'Gene_st':7,'Gene_end':29})
+#     dataf = pd.DataFrame(data)
+#     dataf['zero_repeats'] =  dataf['Gene_end']-dataf['Gene_st']
+#     [0] * dataf['zero_repeats'] [0] 
+#     dataf['range']=str([*range(6,19,1)])
+#     [*range(6,19,1)]
+    
     
 print('Done')
