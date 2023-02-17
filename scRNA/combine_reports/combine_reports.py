@@ -337,7 +337,7 @@ def Generate_Combined_Reports():
     UKBB_Reports = UKBB_Reports.drop_duplicates()
     print(failed_donors)
     UKBB_Reports.loc[UKBB_Reports['GEM Batch']==20240215,'GEM Batch']=200016416452720240215
-    UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='22 Spetember','GEM Batch']='N/A'
+    UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='22 September','GEM Batch']='N/A'
     UKBB_Reports['GEM Batch'] = 'GEM:'+UKBB_Reports['GEM Batch'].astype(str)
     UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='GEM:nan','GEM Batch']='GEM:N/A'
     UKBB_Reports['Antibody batch'] = 'AB:'+UKBB_Reports['Antibody batch'].astype(str)
