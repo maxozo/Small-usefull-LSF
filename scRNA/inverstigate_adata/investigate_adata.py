@@ -13,6 +13,13 @@ def compare_merge_methods():
     comparison = df1.compare(df2)
     print('Done')
 
+def simple_investigation():
+    adata1 ='/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Blood_Fresh/results_rsync_exclude2/results/merged_h5ad/pre_QC_adata.h5ad'
+    ad1 = sc.read_h5ad(filename=adata1)
+    sc.pl.violin(ad1, ['n_genes_by_counts', 'total_counts', 'pct_counts_gene_group__mito_transcript'],
+             jitter=0.4, multi_panel=True)
+    
+
 def look_at_whether_all_samples_are_present():
     #  Purpose - sometimes the reports have a missing samples. Therefore to restart pipeline its good to look at whether this info is in the file in first place.
     adata1 ='/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Cardinal_46499_Jan_21_2023/results/merged_h5ad/outlier_filtered_adata.h5ad'

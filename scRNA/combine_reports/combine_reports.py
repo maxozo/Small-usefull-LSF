@@ -5,13 +5,13 @@ import glob
 print('lets combine reports')
 
 def Generate_Combined_Reports():
-    outdir = "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_15_02"
+    outdir = "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/Tengs_Samples"
     All_Tranche_Data = pd.DataFrame()
     UKBB_Reports = pd.DataFrame()
     UKBB_Missing = pd.DataFrame()
     UKBB_Not_Expected = pd.DataFrame()
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/*/Summary_plots')
-    
+    all_dons = []
     all_gems = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/genestack/gs2/GEMS/*')
     GEMS=pd.DataFrame()
     for g1 in all_gems:
@@ -37,13 +37,33 @@ def Generate_Combined_Reports():
         Tranche_name = path.split('/')[-2]
             
         Tranche_Data = pd.read_csv(f'{path}/Summary/{Tranche_name}_Tranche_Report.tsv',sep='\t')
+        Tranche_Data = Tranche_Data.set_index('Pool id')
+        tranche_input = pd.read_csv(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/{Tranche_name}/results/yascp_inputs/input.tsv',sep='\t')
+        tranche_input = tranche_input.set_index('experiment_id')
+        tranche_input=tranche_input.drop_duplicates()
+        Tranche_Data['expected donors'] = tranche_input['donor_vcf_ids']
+        
+        Donor_Metadata = pd.read_csv(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/{Tranche_name}/results/yascp_inputs/Extra_Metadata_Donors.tsv',sep='\t')
+        Donor_Metadata['Pool_ID']=Donor_Metadata['experiment_id'].str.split('__').str[0]
+        Donor_Metadata['matched_donor_id']=Donor_Metadata['Pool_ID']+'__'+Donor_Metadata['donor']
+        Donor_Metadata = Donor_Metadata.drop_duplicates(subset=['matched_donor_id'])
+        Donor_Metadata = Donor_Metadata.set_index('matched_donor_id')
+            
+        for i,id1 in tranche_input.iterrows():
+            met = Donor_Metadata[Donor_Metadata['Pool_ID']==i]
+            met = met.dropna(subset = ['FAMILY'])
+            met['merge']=met['FAMILY'].astype(str)+met['DRAW_DATE'].astype(str)
+           
+            r1 = id1['donor_vcf_ids']
+            for don1 in r1.replace("'",'').split(','):
+                # print(don1)
+                all_dons.append({'Tranche_name':Tranche_name,'idx':i,'donor':don1,'family': met['merge'].duplicated().any()})
+        Tranche_Data = Tranche_Data.reset_index()
+        
         try:
             Donor_Data = pd.read_csv(f'{path}/Summary/UKBB_REPORT/{Tranche_name}_UKBB_Report.tsv',sep='\t')
-            Donor_Metadata = pd.read_csv(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/{Tranche_name}/results/yascp_inputs/Extra_Metadata_Donors.tsv',sep='\t')
-            Donor_Metadata['Pool_ID']=Donor_Metadata['experiment_id'].str.split('__').str[0]
-            Donor_Metadata['matched_donor_id']=Donor_Metadata['Pool_ID']+'__'+Donor_Metadata['donor']
-            Donor_Metadata = Donor_Metadata.drop_duplicates(subset=['matched_donor_id'])
-            Donor_Metadata = Donor_Metadata.set_index('matched_donor_id')
+            
+
             Donor_Data['Vacutainer ID']=Donor_Data['Vacutainer ID'].astype(str)
             Donor_Data['matched_donor_id']=Donor_Data['Pool ID']+'__'+Donor_Data['Vacutainer ID']
             
@@ -229,7 +249,11 @@ def Generate_Combined_Reports():
                 print('yes')
             Donor_id = f"{row['Donor id']}_{row['Donor id']}"
             Vacutainer = row['Vacutainer ID']
-            if(Vacutainer=='30007491914'):
+            # if(Vacutainer=='30007491914'):
+            #     print('this one') 
+            if(Vacutainer=='30007488198'):
+                print('this one')            
+            if(Vacutainer=='30007540490'):
                 print('this one')
             CC = row['Chromium channel number']
             try:
@@ -298,9 +322,9 @@ def Generate_Combined_Reports():
                             #     Meta = Meta[Meta['live_cell_count'] ==all_donor_data.loc[i,'lab_live_cell_count']]
                         # time = all_donor_data['Sequencing time'].values[0]
                         # Meta = Meta[Meta['State']==time]
-                    viability = ' or '.join(set(Meta['viability']))
-                    Recieved = ' or '.join(set(Meta['RECIEVED']))
-                    cell_count = ' or '.join(set(Meta['live_cell_count']))
+                    viability = ' or '.join(set(Meta['viability'].astype(str)))
+                    Recieved = ' or '.join(set(Meta['RECIEVED'].astype(str)))
+                    cell_count = ' or '.join(set(Meta['live_cell_count'].astype(str)))
                     site = ' or '.join(set(Meta['SITE']))
                     amount_recieved = ' or '.join(set(Meta['customer_measured_volume'].astype(str)))
                     sequencing_time = ' or '.join(set(Meta['State'].astype(str)))
@@ -336,8 +360,10 @@ def Generate_Combined_Reports():
     UKBB_Reports = UKBB_Reports_UKB_1_FIXED
     UKBB_Reports = UKBB_Reports.drop_duplicates()
     print(failed_donors)
+    all_donors_processed = pd.DataFrame(all_dons)
+    all_donors_processed.to_csv(f'{outdir}/all_donors_processed.csv',index=False,sep='\t')
     UKBB_Reports.loc[UKBB_Reports['GEM Batch']==20240215,'GEM Batch']=200016416452720240215
-    UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='22 September','GEM Batch']='N/A'
+    UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='Spetember','GEM Batch']='N/A'
     UKBB_Reports['GEM Batch'] = 'GEM:'+UKBB_Reports['GEM Batch'].astype(str)
     UKBB_Reports.loc[UKBB_Reports['GEM Batch']=='GEM:nan','GEM Batch']='GEM:N/A'
     UKBB_Reports['Antibody batch'] = 'AB:'+UKBB_Reports['Antibody batch'].astype(str)
@@ -374,6 +400,7 @@ def Generate_Combined_Reports():
     THP1 = UKBB_Reports_UKB[UKBB_Reports_UKB['Vacutainer ID']=='THP1']
     U937 = UKBB_Reports_UKB[UKBB_Reports_UKB['Vacutainer ID']=='U937']
     UKBB_DONORS = len(UKBB_Reports_UKB['Vacutainer ID'])-len(THP1)-len(U937)
+
     print(f"# In total we have {len(set(All_Tranche_Data['Experiment id']))} tranches from which {len(set(All_Tranche_Data_UKBB['Experiment id']))} tranches contain UKBB samples (correspond to sequencing runs). UKBB samples are contained within {len(set(All_Tranche_Data_UKBB['Pool id']))} pools (from which {len(All_Tranche_Data_UKBB[All_Tranche_Data_UKBB['Tranche Pass/Fail']=='PASS'])} pass UKBB pool tresholds). \n \
         # We have {len(UKBB_Reports_UKB['Vacutainer ID'])} reported in total from which {UKBB_DONORS} are UKBB_DONORS donors; {len(THP1)} THP1 spikeins; {len(U937)} U937 spikeins; From these {len(UKBB_Reports_UKB[UKBB_Reports_UKB['Overall Pass Fail']=='PASS'])} pass UKBB donor tresholds \n \
         # {len(set(Dublicated['Vacutainer ID']))-2} Donors are repeated twice - 24h and 48h\n \
