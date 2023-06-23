@@ -67,12 +67,12 @@ def add_extraction_date_to_reports():
                                     all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC']),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools']),'reasoning':'Ids between LIMS and Metadata do not match'})
                                     print(f'breaking: {donor}')
                         except:
-                            all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index.astype(str)), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC']),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools']),'reasoning':'Ids between LIMS and Metadata do not match'})
+                            all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index.astype(str)), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC'].astype(str)),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools'].astype(str)),'reasoning':'Ids between LIMS and Metadata do not match'})
                             print(f'breaking: {donor}')
                     elif len(Donor_vars)<1:
                         # Here we dont find the DOnor at all in metadata
                         record=False
-                        all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC']),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools']),'reasoning':'Donot Missing from Metadata'})
+                        all_unnown.append({'Tranche':Pool,'Experiment':Experiment,'Donor lims ID':donor_lims_id, 'Donor':donor,'Chromium Chanel':chrom_chan,'Possible Cellaca IDs':';'.join(Donor_vars_Pre.index), 'Possible LC BLOOD ARRAYS':';'.join(Donor_vars_Pre['LCA_PBMC']),'Possible LCA PBMC Pools':';'.join(Donor_vars_Pre['LCA PBMC Pools'].astype(str)),'reasoning':'Donor Missing from Metadata'})
                         print(f'breaking: {donor}')                       
                     if record:        
                         D1.loc[i1,'PBMC extraction date']=Donor_vars['PBMC extraction date '].values[0]
@@ -146,15 +146,20 @@ def get_total_cell_compositions():
         
 def combine_all_meta():
     # This is used to combine all Stephens metadata reports in one file that is later on utilised to determine the PBMC extraction date and the time of sequencing.
-    all_vcfs = glob.glob(f'/nfs/team151/CARDINAL/*/*eta_*.xl*')
+    all_vcfs = glob.glob(f'/nfs/team151/CARDINAL/CARDINAL/*/*eta_*.xl*')
+    all_vcfs2 = glob.glob(f'/nfs/team151/CARDINAL/*/*eta_*.xl*')
+    all_vcfs = all_vcfs+all_vcfs2
     All_META = pd.DataFrame()
     for xl1 in all_vcfs:
         print(xl1)
         # xl1 = "/nfs/team151/CARDINAL/12_12_20/Meta_data_121222.xlsm"
         if (xl1.split('/')[-1][0]!='~'):
-            D1 = pd.read_excel(xl1,sheet_name='LCA_PBMC')
-            D2 = D1.dropna(subset=['SAMPLE BARCODE'])
-            All_META=pd.concat([All_META,D2])
+            try:
+                D1 = pd.read_excel(xl1,sheet_name='LCA_PBMC')
+                D2 = D1.dropna(subset=['SAMPLE BARCODE'])
+                All_META=pd.concat([All_META,D2])
+            except:
+                print('not cardinal')
         else:
             print(f"fail:{xl1}")  
     All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_16_03_2023.tsv',sep='\t')

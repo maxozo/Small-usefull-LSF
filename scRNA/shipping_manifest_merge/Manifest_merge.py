@@ -38,12 +38,16 @@ def Bridge_Files():
     ELGH2.oragene_id = ELGH2.oragene_id.str.split('_').str[0]
     ELGH3 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/genotypes/ELGH/release3/New_Bridge.csv',sep=',', dtype = str)
     ELGH3=ELGH3.rename(columns={'OrageneID_ifnopseudoNHS':'oragene_id'})
+    # s00046_id	GSA_oragene
+    # S2-999-90054	1544433
+    ELGH4=pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/genotypes/ELGH/release4/bridge4.csv',sep='\t', dtype = str)
+    ELGH4=ELGH4.rename(columns={'GSA_oragene':'oragene_id'})
     cellines = pd.DataFrame([{'s00046_id':'U937','oragene_id':'celline_U937'},{'s00046_id':'THP1','oragene_id':'celline_THP1'}])
     All_Data = pd.concat([All_Data,ELGH,ELGH2,ELGH3,cellines])
     All_Data = All_Data.drop_duplicates()
     All_Data.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/secret/bridge.txt',sep='\t',index=False)
     
-Shipping_Manifests()
+# Shipping_Manifests()
 Bridge_Files()  
 
 

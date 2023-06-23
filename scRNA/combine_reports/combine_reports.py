@@ -5,14 +5,14 @@ import glob
 print('lets combine reports')
 
 def Generate_Combined_Reports():
-    outdir = "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/Tengs_Samples"
+    outdir = "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_3_04"
     All_Tranche_Data = pd.DataFrame()
     UKBB_Reports = pd.DataFrame()
     UKBB_Missing = pd.DataFrame()
     UKBB_Not_Expected = pd.DataFrame()
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/*/Summary_plots')
     all_dons = []
-    all_gems = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/genestack/gs2/GEMS/*')
+    all_gems = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/genestack/gs3/GEMs/*')
     GEMS=pd.DataFrame()
     for g1 in all_gems:
         d1 = pd.read_csv(g1)
@@ -25,7 +25,7 @@ def Generate_Combined_Reports():
     GEMS_DONOR_72h = GEMS['72h'].str.split(',')
     GEMS_DONOR_frozen_h = GEMS['Frozen'].str.split(',')
     
-    all_donors_gs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/genestack/gs2/meta/*')
+    all_donors_gs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/genestack/gs3/meta/*')
     DONS=pd.DataFrame()
     for g1 in all_donors_gs:
         d1 = pd.read_csv(g1)
@@ -131,7 +131,13 @@ def Generate_Combined_Reports():
             if (Donor_id=='celline_celline'):
                 PIHAT = 1
             else:
-                PIHAT = M_COM['PI_HAT'].values[0]
+                try:
+                    PIHAT = M_COM['PI_HAT'].values[0]
+                except:
+                    if row['Experiment ID']=='Cardinal_46879_Mar_15_2023':
+                        PIHAT = 1
+                    else:
+                        print('exception')
             
             
                 all_donor_data.loc[i,'PiHat: Expected']=PIHAT
@@ -156,7 +162,7 @@ def Generate_Combined_Reports():
                     all_donor_data.loc[i,'Sequencing time']=' or '.join(set(Meta['State'].astype(str)))
                 except:
                     print(f'pool {experiment} doesnt contain the metadata')
-                all_donor_data.loc[i,'amount recieved']=Meta['customer_measured_volume'].values[0]
+                # all_donor_data.loc[i,'amount recieved']=Meta['customer_measured_volume'].values[0]
         UKBB_Reports_UKB_1_FIXED=pd.concat([UKBB_Reports_UKB_1_FIXED,all_donor_data])
     UKBB_Reports = pd.concat([UKBB_Reports_UKB_0,UKBB_Reports_UKB_1_FIXED])
     
@@ -226,6 +232,7 @@ def Generate_Combined_Reports():
     UKBB_Reports_UKB_1 = UKBB_Reports
     UKBB_Reports_UKB_1_FIXED =pd.DataFrame()
     failed_donors=[]
+    all_missing=[]
     for pool in set(UKBB_Reports_UKB_1['Pool ID']):
         all_donor_data = UKBB_Reports_UKB_1[UKBB_Reports_UKB_1['Pool ID']==pool]
         experiment = list(set(UKBB_Reports_UKB_1[UKBB_Reports_UKB_1['Pool ID']==pool]['Experiment ID']))[0]
@@ -240,6 +247,20 @@ def Generate_Combined_Reports():
         # viability                                                                              NaN
         # lab_live_cell_count                                                                    NaN
         # site                                                                                   NaN
+        All_expected2 = All_expected.replace("'",'')
+        All_expected2 = pd.DataFrame(All_expected2.split(","),columns=['str1'])
+        All_expected2 = All_expected2[~All_expected2['str1'].str.startswith('S2')]
+        All_expected2 = All_expected2['str1'].str.replace('^0*', '')
+        All_expected2 = set(All_expected2)
+        all_deconvoluted_donors = set(all_donor_data['Vacutainer ID'])
+        Missing = All_expected2-all_deconvoluted_donors
+        if len(Missing)>0:
+            for m1 in Missing:
+                if m1.startswith('THP1'):
+                    continue
+                if m1.startswith('U937'):
+                    continue
+                all_missing.append({'Experiment ID':experiment,'Pool':pool, 'Sample':m1})
         for i,row in all_donor_data.iterrows():
             print(i)
             Donor_id_pre = f"d{row['Pool_ID.Donor_Id'].split('_d')[1]}"
@@ -251,9 +272,9 @@ def Generate_Combined_Reports():
             Vacutainer = row['Vacutainer ID']
             # if(Vacutainer=='30007491914'):
             #     print('this one') 
-            if(Vacutainer=='30007488198'):
+            if(Vacutainer=='30007453196'):
                 print('this one')            
-            if(Vacutainer=='30007540490'):
+            if(Vacutainer=='30007479851'):
                 print('this one')
             CC = row['Chromium channel number']
             try:
@@ -270,7 +291,10 @@ def Generate_Combined_Reports():
                             timing='frozen'
                             if GEMS_DONOR_frozen_h[CC][index]!='Yes':
                                 timing='N/A'
-                donor_data = DONS[DONS['Name'] ==Vacutainer]
+                try:
+                    donor_data = DONS[DONS['Name'] ==Vacutainer]
+                except:
+                    print('donor missing in gs')
                 # donor_data = donor_data[donor_data['State']==timing]
                 try:
                     State_split = donor_data['State'].values[0].split(',')
@@ -359,6 +383,12 @@ def Generate_Combined_Reports():
         UKBB_Reports_UKB_1_FIXED=pd.concat([UKBB_Reports_UKB_1_FIXED,all_donor_data])
     UKBB_Reports = UKBB_Reports_UKB_1_FIXED
     UKBB_Reports = UKBB_Reports.drop_duplicates()
+    all_missing2=pd.DataFrame(all_missing)
+    mis_set = set(all_missing2.Sample)
+    UKBB_Missing.Sample = UKBB_Missing.Sample.astype(str)
+    UKBB_Missing.Sample = UKBB_Missing.Sample.str.replace('\.0','')
+    UKBB_Missing=all_missing2
+    miss_set2 = set(UKBB_Missing.Sample)
     print(failed_donors)
     all_donors_processed = pd.DataFrame(all_dons)
     all_donors_processed.to_csv(f'{outdir}/all_donors_processed.csv',index=False,sep='\t')
@@ -387,7 +417,7 @@ def Generate_Combined_Reports():
     UKBB_Reports_UKB = UKBB_Reports_UKB[UKBB_Reports_UKB['Pool ID']!='CRD_CMB13303517']
     # We also remove a donors that are in the pool CRD_CMB13303517 as this has some issues of donors mapping to the same id and donors that are missing as part of deconvolutions.
     
-    To_Add_to_Missing = Fail_Pihat_threshold[['Pool ID', 'Vacutainer ID']]
+    To_Add_to_Missing = Fail_Pihat_threshold[['Experiment ID','Pool ID', 'Vacutainer ID']]
     UKBB_Missing_UKBB = pd.concat([UKBB_Missing,To_Add_to_Missing])
     UKBB_Reports_UKB = UKBB_Reports_UKB.rename(columns={'Sequencing time':'Library prep time'})
     UKBB_Reports_UKB = UKBB_Reports_UKB.drop(columns=['PiHat: Expected', 'Infered Relatednes (PiHAT>0.3)','PBMC extraction date','Antibody batch','Conc Pass','RapidSphere Beads'])
@@ -415,13 +445,17 @@ def Generate_Combined_Reports():
     UKBB_Reports_UKB.to_csv(f'{outdir}/ukbb_pihat_processed/Combined_UKBB_Donor_Report.tsv',sep='\t',index=False)
     All_Tranche_Data_UKBB.to_csv(f'{outdir}/ukbb_pihat_processed/Combined_UKBB_Tranche_Report.tsv',sep='\t',index=False)    
  
-    f1 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_01_3/ukbb_pihat_processed'
-    f2 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_15_02/ukbb_pihat_processed'
+    # f1 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_01_3/ukbb_pihat_processed'
+    # f2 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_15_02/ukbb_pihat_processed'
+    f1 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_15_02/ukbb_pihat_processed'
+    f2 = '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_3_04/ukbb_pihat_processed'
     Donor_Report_1 = pd.read_csv(f"{f1}/Combined_UKBB_Donor_Report.tsv",sep='\t')
     Donor_Report_2 = pd.read_csv(f"{f2}/Combined_UKBB_Donor_Report.tsv",sep='\t') 
+    print(f"In previous report provided to UKBB we had {len(Donor_Report_1['Pool ID']+Donor_Report_1['Vacutainer ID'])} donors wheres now we have {len(Donor_Report_2['Pool ID']+Donor_Report_2['Vacutainer ID'])} donors.")
     
     print(f"In previous report provided to UKBB we had {len(Donor_Report_1['Vacutainer ID'])} donors wheres now we have {len(Donor_Report_2['Vacutainer ID'])} donors.")
-    print(f"We have {len(set(Donor_Report_2['Vacutainer ID'])-set(Donor_Report_1['Vacutainer ID']))} new donors added and {len(set(Donor_Report_1['Vacutainer ID'])-set(Donor_Report_2['Vacutainer ID']))} donors that are not present in the new report")
+    print(f"We have {len(set(Donor_Report_2['Pool ID']+Donor_Report_2['Vacutainer ID'])-set(Donor_Report_1['Pool ID']+Donor_Report_1['Vacutainer ID']))} new donors added and {len(set(Donor_Report_1['Pool ID']+Donor_Report_1['Vacutainer ID'])-set(Donor_Report_2['Pool ID']+Donor_Report_2['Vacutainer ID']))} donors that are not present in the new report")
+    print('Done')
     
 def Generate_Combined_Reports_ELGH():
     outdir = "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/ukbb_handover/reports/2023_01_ELGH"

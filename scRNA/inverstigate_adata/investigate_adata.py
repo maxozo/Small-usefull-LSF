@@ -14,7 +14,7 @@ def compare_merge_methods():
     print('Done')
 
 def simple_investigation():
-    adata1 ='/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Blood_Fresh/results_rsync_exclude2/results/merged_h5ad/pre_QC_adata.h5ad'
+    adata1 ='/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Cardinal_47074_Apr_11_2023/work/d7/dc7e8ee6e600a014797430520ade95/results/merged_h5ad/outlier_filtered_adata.h5ad'
     ad1 = sc.read_h5ad(filename=adata1)
     sc.pl.violin(ad1, ['n_genes_by_counts', 'total_counts', 'pct_counts_gene_group__mito_transcript'],
              jitter=0.4, multi_panel=True)
@@ -29,45 +29,46 @@ def look_at_whether_all_samples_are_present():
     Donor_data = lane_qc[lane_qc['Donor'] == 'donor1']
     
 
-'convoluted_samplename', 'donor_id', 'prob_max', 'prob_doublet',
-       'n_vars', 'best_singlet', 'best_doublet', 'experiment_id',
-       'chromium_channel', 'id_run', 'id_study_tmp', 'id_study_lims',
-       'last_updated', 'loading_concentration', 'created', 'instrument_model',
-       'instrument_external_name', 'instrument_name', 'n_pooled', 'instrument',
-       'nr_ukbb_samples', 'nr_elgh_samples', 'nr_spikeins', 'n_cells',
-       'n_genes_by_counts', 'log1p_n_genes_by_counts', 'total_counts',
-       'log1p_total_counts', 'pct_counts_in_top_50_genes',
-       'pct_counts_in_top_100_genes', 'pct_counts_in_top_200_genes',
-       'pct_counts_in_top_500_genes',
-       'total_counts_gene_group__mito_transcript',
-       'log1p_total_counts_gene_group__mito_transcript',
-       'pct_counts_gene_group__mito_transcript',
-       'total_counts_gene_group__mito_protein',
-       'log1p_total_counts_gene_group__mito_protein',
-       'pct_counts_gene_group__mito_protein',
-       'total_counts_gene_group__ribo_protein',
-       'log1p_total_counts_gene_group__ribo_protein',
-       'pct_counts_gene_group__ribo_protein',
-       'total_counts_gene_group__ribo_rna',
-       'log1p_total_counts_gene_group__ribo_rna',
-       'pct_counts_gene_group__ribo_rna', 'cell_passes_qc', 'batch',
-       'log10_ngenes_by_count', 'normalization_factor',
-       'Azimuth:predicted.celltype.l2', 'Azimuth:predicted.celltype.l2.score',
-       'Azimuth:mapping.score', 'Azimuth:L0_predicted.celltype.l2',
-       'Azimuth:L1_predicted.celltype.l2',
-       'Celltypist:Immune_All_High:predicted_labels',
-       'Celltypist:Immune_All_High:over_clustering',
-       'Celltypist:Immune_All_High:majority_voting',
-       'Celltypist:Immune_All_Low:predicted_labels',
-       'Celltypist:Immune_All_Low:over_clustering',
-       'Celltypist:Immune_All_Low:majority_voting', 'Donor', 'Exp',
-       'cell_passes_hard_filters',
-       'cell_passes_qc-per:Azimuth:L0_predicted.celltype.l2',
-       'cell_passes_qc-per:Azimuth:L0_predicted.celltype.l2:score',
-       'cell_passes_qc:score', 'cell_passes_qc-per:all_together::exclude',
-       'cell_passes_qc-per:all_together::exclude:score'],
-look_at_whether_all_samples_are_present()
-compare_merge_methods()
+    #     'convoluted_samplename', 'donor_id', 'prob_max', 'prob_doublet',
+    #    'n_vars', 'best_singlet', 'best_doublet', 'experiment_id',
+    #    'chromium_channel', 'id_run', 'id_study_tmp', 'id_study_lims',
+    #    'last_updated', 'loading_concentration', 'created', 'instrument_model',
+    #    'instrument_external_name', 'instrument_name', 'n_pooled', 'instrument',
+    #    'nr_ukbb_samples', 'nr_elgh_samples', 'nr_spikeins', 'n_cells',
+    #    'n_genes_by_counts', 'log1p_n_genes_by_counts', 'total_counts',
+    #    'log1p_total_counts', 'pct_counts_in_top_50_genes',
+    #    'pct_counts_in_top_100_genes', 'pct_counts_in_top_200_genes',
+    #    'pct_counts_in_top_500_genes',
+    #    'total_counts_gene_group__mito_transcript',
+    #    'log1p_total_counts_gene_group__mito_transcript',
+    #    'pct_counts_gene_group__mito_transcript',
+    #    'total_counts_gene_group__mito_protein',
+    #    'log1p_total_counts_gene_group__mito_protein',
+    #    'pct_counts_gene_group__mito_protein',
+    #    'total_counts_gene_group__ribo_protein',
+    #    'log1p_total_counts_gene_group__ribo_protein',
+    #    'pct_counts_gene_group__ribo_protein',
+    #    'total_counts_gene_group__ribo_rna',
+    #    'log1p_total_counts_gene_group__ribo_rna',
+    #    'pct_counts_gene_group__ribo_rna', 'cell_passes_qc', 'batch',
+    #    'log10_ngenes_by_count', 'normalization_factor',
+    #    'Azimuth:predicted.celltype.l2', 'Azimuth:predicted.celltype.l2.score',
+    #    'Azimuth:mapping.score', 'Azimuth:L0_predicted.celltype.l2',
+    #    'Azimuth:L1_predicted.celltype.l2',
+    #    'Celltypist:Immune_All_High:predicted_labels',
+    #    'Celltypist:Immune_All_High:over_clustering',
+    #    'Celltypist:Immune_All_High:majority_voting',
+    #    'Celltypist:Immune_All_Low:predicted_labels',
+    #    'Celltypist:Immune_All_Low:over_clustering',
+    #    'Celltypist:Immune_All_Low:majority_voting', 'Donor', 'Exp',
+    #    'cell_passes_hard_filters',
+    #    'cell_passes_qc-per:Azimuth:L0_predicted.celltype.l2',
+    #    'cell_passes_qc-per:Azimuth:L0_predicted.celltype.l2:score',
+    #    'cell_passes_qc:score', 'cell_passes_qc-per:all_together::exclude',
+    #    'cell_passes_qc-per:all_together::exclude:score'],
+# look_at_whether_all_samples_are_present()
+# compare_merge_methods()
+simple_investigation()
 print('Done')
 
 

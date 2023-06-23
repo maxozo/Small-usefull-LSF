@@ -9,8 +9,8 @@ echo $bgen
 
 plink2 --bgen $bgen ref-first --sample $sample --export vcf vcf-dosage=DS --out $out_path37/$name
 # plink2 --bgen $bgen ref-last --sample $sample --export vcf vcf-dosage=DS --out $out_path37/ref_last_$name
-
-CrossMap.py vcf /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/genotypes/liftover_chain_files/GRCh37_to_GRCh38.chain.gz $out_path37/$name.vcf $genomeref $out_path/hg38_$name.vcf
+bcftools +fixref $out_path37/$name.vcf -Ov -o $out_path37/"$name"_fixref.vcf -- -d -f /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/genotypes/onek1k/hg38/vcf/Homo_sapiens_assembly19.fasta -m flip
+CrossMap.py vcf /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/genotypes/liftover_chain_files/GRCh37_to_GRCh38.chain.gz $out_path37/"$name"_fixref.vcf $genomeref $out_path/hg38_$name.vcf
 rm $out_path37/$name*
 bgzip --threads 10 $out_path/hg38_$name.vcf
 
