@@ -145,10 +145,12 @@ for file1 in all_files:
     try:
         adata_cellbender = anndata_from_h5(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/{tranche}/Donor_Quantification/{pool}/Cellbender_filtered_0pt1__{pool}.h5',
                                                 analyzed_barcodes_only=True)
+        # os.system(f'ln -s /lustre/scratch123/hgi/projects/cardinal_analysis/qc/{tranche}/Donor_Quantification/{pool}/Cellbender_filtered_0pt1__{pool}.h5 /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/{tranche}/results_rsync2/results/nf-preprocessing/cellbender/{pool}/cellbender-epochs_250__learnrt_0pt000005__zdim_100__zlayer_500__lowcount_10/Cellbender_filtered_0pt1__{pool}.h5')
     except:
         # /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Cardinal_45327_Jul_18_2022/results_rsync2/results/nf-preprocessing/cellbender/CRD_CMB13016570/cellbender-epochs_250__learnrt_0pt000005__zdim_100__zlayer_500__lowcount_10/cellbender_FPR_0.01_filtered.h5
         try:
             adata_cellbender = anndata_from_h5(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/{tranche}/results_rsync2/results/nf-preprocessing/cellbender/{pool}/cellbender-epochs_250__learnrt_0pt000005__zdim_100__zlayer_500__lowcount_10/cellbender_FPR_0.01_filtered.h5',
+                     
                                                 analyzed_barcodes_only=True)
         except:
             print('No ambientness association since no cb file exists')
@@ -164,6 +166,8 @@ for file1 in all_files:
     Number_of_cells = f3.shape[0]
     Number_of_genes = f3.shape[1]
     ambientness = f3.sum()
+    ambientness_per_cell = pd.DataFrame(f3.sum(axis=1),columns=['cell ambientness'],index=filtered_adata_cellbender_un.obs.index)
+    ambientness_per_cell.to_csv(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/{tranche}/Donor_Quantification/{pool}/ambientness_per_cell_{pool}.tsv',sep='\t')
     pd.DataFrame([{'pool':pool,'tranche':tranche,'ambientness':ambientness,'Number_of_genes':Number_of_genes,'Number_of_cells':Number_of_cells}]).to_csv(f'/lustre/scratch123/hgi/projects/cardinal_analysis/qc/{tranche}/Donor_Quantification/{pool}/ambientness_{pool}.tsv',sep='\t',index=False)
     all_ambientness.append({'pool':pool,'tranche':tranche,'ambientness':ambientness,'Number_of_genes':Number_of_genes,'Number_of_cells':Number_of_cells})
     del adata_cellbender
@@ -174,3 +178,14 @@ pd.DataFrame(all_ambientness).to_csv('/lustre/scratch123/hgi/projects/cardinal_a
 # adata_cellranger_raw = sc.read_10x_mtx('/lustre/scratch125/humgen/teams/hgi/mo11/oneK1k/extra0_cellspPanel_subsampling/results_extra_0/nf-preprocessing/cellbender/pool3/cellbender-epochs_250__learnrt_0pt000005__zdim_100__zlayer_500__lowcount_10/cellbenderFPR_0pt1filtered_10x_mtx')
 # adata_cellranger_filtered = scanpy.read_10x_mtx(f"{df_raw.loc[expid, 'data_path_10x_format']}/filtered_feature_bc_matrix")
 # ad_lane_filtered = scanpy.read_10x_mtx(f"{df_raw.loc[expid, 'data_path_10x_format']}/filtered_feature_bc_matrix")
+
+# adata_cellbender = anndata_from_h5(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc_with_GT/Cardinal_46019_Oct_20_2022/results/nf-preprocessing/cellbender/CRD_CMB13195918/cellbender-epochs_250__learnrt_0pt000005__zdim_100__zlayer_500__lowcount_10/cellbender_FPR_0pt1_filtered.h5',
+#                                         analyzed_barcodes_only=True)
+
+# adata_cellbender_un = anndata_from_h5('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc_with_GT/Cardinal_46019_Oct_20_2022/results/nf-preprocessing/cellbender/CRD_CMB13195918/cellbender-epochs_250__learnrt_0pt000005__zdim_100__zlayer_500__lowcount_10/cellbender_FPR_0pt1_unfiltered.h5',
+#                                         analyzed_barcodes_only=True)
+
+# adata_cellbender_un2 = anndata_from_h5('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc_with_GT/Cardinal_46019_Oct_20_2022/results/nf-preprocessing/cellbender/CRD_CMB13195918/cellbender-epochs_250__learnrt_0pt000005__zdim_100__zlayer_500__lowcount_10/cellbender_FPR_0.1.h5',
+#                                         analyzed_barcodes_only=True)
+
+# adata_cellbender['ambient_expression']

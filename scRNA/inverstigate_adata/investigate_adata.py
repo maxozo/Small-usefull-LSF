@@ -14,7 +14,7 @@ def compare_merge_methods():
     print('Done')
 
 def simple_investigation():
-    adata1 ='/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Cardinal_47074_Apr_11_2023/work/d7/dc7e8ee6e600a014797430520ade95/results/merged_h5ad/outlier_filtered_adata.h5ad'
+    adata1 ='/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Cardinal_45591_Aug_17_2022/results_rsync2/results/merged_h5ad/pre_QC_adata.h5ad'
     ad1 = sc.read_h5ad(filename=adata1)
     sc.pl.violin(ad1, ['n_genes_by_counts', 'total_counts', 'pct_counts_gene_group__mito_transcript'],
              jitter=0.4, multi_panel=True)

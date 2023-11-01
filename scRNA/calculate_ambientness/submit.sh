@@ -1,1 +1,1 @@
-bsub -R'select[mem>80000] rusage[mem=80000]' -J sort_and_index  -n 1 -M 80000 -o sort_and_index.o -e sort_and_index.e -q long python ./ambientness.py
+bsub -R'select[mem>50000] rusage[mem=50000]' -J ambientness  -n 1 -M 50000 -o ambientness.o -e ambientness.e -q normal python ./ambientness.py

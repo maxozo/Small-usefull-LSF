@@ -11,16 +11,19 @@ def update_all_metadata():
             
 def add_extraction_date_to_reports():
     # This was used to extract all the timings from Stephens metadata to add to the YASCP input files.
-    All_Concentrated_Lab_Metadata = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_16_03_2023.tsv',sep='\t')
+    All_Concentrated_Lab_Metadata = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_12_07_2023.tsv',sep='\t')
     All_Concentrated_Lab_Metadata = All_Concentrated_Lab_Metadata.set_index('Cellaca ID')
     all_vcfs = glob.glob(f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/*/results/yascp_inputs/Extra_Metadata_Donors.tsv')
     all_unnown = []
     # gem_batch_data = pd.read_csv("/lustre/scratch123/hgi/projects/cardinal_analysis/analysis/common_files/metadata/GEM_metadata_merged.tsv",sep='\t')
+    to_add= ['Cardinal_47269_May_22_2023','Cardinal_47469_Jun_16_2023']
     for path in all_vcfs:  
         # path=f'/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/Cardinal_46019_Oct_20_2022/results/yascp_inputs/Extra_Metadata_Donors.tsv'
         Tranche_Data_path = '/'.join(path.split('/')[:-1])
         Tranche_Data_path=pd.read_csv(f'{Tranche_Data_path}/Extra_Metadata.tsv',sep='\t')
         Pool = path.split('/')[-4]
+        if (Pool not in to_add):
+            continue
         D1 = pd.read_csv(path,sep='\t')
         if (Pool=='Blood_Fresh'):
             continue
@@ -162,7 +165,7 @@ def combine_all_meta():
                 print('not cardinal')
         else:
             print(f"fail:{xl1}")  
-    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_16_03_2023.tsv',sep='\t')
+    All_META.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/metadata/metadata_merged_12_07_2023.tsv',sep='\t')
 add_extraction_date_to_reports()
 # combine_all_meta()
 print('Done')

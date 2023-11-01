@@ -43,7 +43,7 @@ def Bridge_Files():
     ELGH4=pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/genotypes/ELGH/release4/bridge4.csv',sep='\t', dtype = str)
     ELGH4=ELGH4.rename(columns={'GSA_oragene':'oragene_id'})
     cellines = pd.DataFrame([{'s00046_id':'U937','oragene_id':'celline_U937'},{'s00046_id':'THP1','oragene_id':'celline_THP1'}])
-    All_Data = pd.concat([All_Data,ELGH,ELGH2,ELGH3,cellines])
+    All_Data = pd.concat([All_Data,ELGH,ELGH2,ELGH3,ELGH4,cellines])
     All_Data = All_Data.drop_duplicates()
     All_Data.to_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/secret/bridge.txt',sep='\t',index=False)
     
