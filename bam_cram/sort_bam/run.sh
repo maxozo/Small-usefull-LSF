@@ -1,0 +1,2 @@
+samtools sort /lustre/scratch123/hgi/projects/cardinal_analysis/analysis/common_files/OneK1K/cellranger/pool1/outs/possorted_genome_bam.bam -o /lustre/scratch125/humgen/teams/hgi/ip13/1k1k/hadge/hadge/onek1k_data/srt_possorted_genome_bam.bam
+samtools index /lustre/scratch125/humgen/teams/hgi/ip13/1k1k/hadge/hadge/onek1k_data/srt_possorted_genome_bam.bam
