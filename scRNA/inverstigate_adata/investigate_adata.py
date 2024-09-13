@@ -14,8 +14,14 @@ def compare_merge_methods():
     print('Done')
 
 def simple_investigation():
-    adata1 ='/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/qc/Cardinal_45591_Aug_17_2022/results_rsync2/results/merged_h5ad/pre_QC_adata.h5ad'
+    adata1 ='/lustre/scratch123/hgi/mdt1/projects/jaguar_analysis/analysis/mo11/sample_yascp_run/4.yascp_full_run1.5/results/clustering/normalize=total_count.vars_to_regress=pct_counts_gene_group__mito_transcript/reduced_dims-null-harmony.n_pcs=19.variables=experiment_id.thetas=1.0/umap_gather_out_gene_symbols.h5ad'
     ad1 = sc.read_h5ad(filename=adata1)
+    # donor_ids = [f'pool1.donor{i}' for i in range(12)]
+    # donor_filtered_adata = ad1[ad1.obs['Pool.Donor'].isin(donor_ids)]
+    # donor_filtered_adata.write(
+    #     '/software/hgi/pipelines/QTLight/test_Onek1kPool1.h5ad',
+    #     compression='gzip'
+    # )
     sc.pl.violin(ad1, ['n_genes_by_counts', 'total_counts', 'pct_counts_gene_group__mito_transcript'],
              jitter=0.4, multi_panel=True)
     
@@ -27,6 +33,7 @@ def look_at_whether_all_samples_are_present():
     print('Done')
     lane_qc = ad1.obs[ad1.obs['convoluted_samplename']=='ELGH_VAL12156641']
     Donor_data = lane_qc[lane_qc['Donor'] == 'donor1']
+    
     
 
     #     'convoluted_samplename', 'donor_id', 'prob_max', 'prob_doublet',

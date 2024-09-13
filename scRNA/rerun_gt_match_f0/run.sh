@@ -1,0 +1,2 @@
+module load HGI/pipelines/yascp/1.7
+bsub -R'select[mem>10000] rusage[mem=10000]' -J gt.sub -n 1 -M 10000 -o gt.o -e gt.e -q oversubscribed nextflow run /software/hgi/pipelines/yascp_versions/yascp_v1.7 -profile sanger -entry GT_MATCH -c input.nf -resume

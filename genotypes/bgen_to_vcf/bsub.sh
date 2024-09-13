@@ -1,0 +1,1 @@
+bsub -R'select[mem>10000] rusage[mem=10000]' -J elgh_conv2 -n 6 -M 10000 -o elgh_conv2.o -e elgh_conv2.e -q basement bash elgh_bgen_to_vcf2.sh
